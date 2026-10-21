@@ -1,0 +1,9 @@
+{
+  "name": "Chiffres Français — フランス語数字トレーナー",
+  "short_name": "仏語数字",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1d4ed8",
+  "lang": "ja"
+}

@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Chiffres Français — フランス語数字トレーナー</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .french-serif {
+      letter-spacing: -0.01em;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      70% { transform: scale(1); box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .mic-listening {
+      animation: pulse-ring 1.6s infinite;
+    }
+    .numpad-btn:active {
+      transform: scale(0.96);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+
+  <!-- Top Header Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="flex h-8 w-8 rounded-lg overflow-hidden shadow-sm border border-slate-200 shrink-0" aria-hidden="true">
+          <div class="w-1/3 bg-blue-700"></div>
+          <div class="w-1/3 bg-white"></div>
+          <div class="w-1/3 bg-red-600"></div>
+        </div>
+        <div class="truncate">
+          <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">Chiffres Français</h1>
+          <p class="text-[11px] text-slate-500 hidden sm:block">標準フランス語 0〜1000 反復トレーナー</p>
+        </div>
+      </div>
+
+      <!-- Right Action Controls -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <!-- Cloud Auto-Sync Status Button -->
+        <button id="btnOpenSyncModal" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium border transition-colors bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200" title="PC・スマホ間の自動クラウド同期設定">
+          <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+          <span id="syncStatusText" class="truncate max-w-[110px] sm:max-w-none">自動同期: 未設定</span>
+        </button>
+
+        <!-- Weight & Range Settings Button -->
+        <button id="btnOpenWeightsModal" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors" title="重み付け配分・音声設定">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          <span class="hidden sm:inline">重み・設定</span>
+        </button>
+
+        <!-- Stats & Dictionary Button -->
+        <button id="btnOpenStatsModal" type="button" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors" title="学習統計・苦手リスト・数字一覧">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span class="hidden sm:inline">成績・一覧</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-6 py-4 flex flex-col gap-3.5">
+
+    <!-- Mode Switcher & Range Selector Bar -->
+    <section class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/80 flex flex-col gap-2.5">
+      <!-- Mode Tabs -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-slate-100 p-1 rounded-xl" role="tablist" aria-label="学習モード選択">
+        <button type="button" data-mode="speak" class="mode-tab-btn py-2 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 bg-white text-blue-700 shadow-sm">
+          <span>🎙️</span>
+          <span>数字 → 発音</span>
+        </button>
+        <button type="button" data-mode="read" class="mode-tab-btn py-2 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+          <span>📖</span>
+          <span>綴り → 数字</span>
+        </button>
+        <button type="button" data-mode="listen" class="mode-tab-btn py-2 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+          <span>🎧</span>
+          <span>音声 → 数字</span>
+        </button>
+        <button type="button" data-mode="mix" class="mode-tab-btn py-2 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900">
+          <span>🔀</span>
+          <span>ミックス出題</span>
+        </button>
+      </div>
+
+      <!-- Range Filter Pills & Session Counters -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+        <div class="flex flex-wrap items-center gap-1" id="rangeFilterContainer" aria-label="出題範囲フィルタ">
+          <button type="button" data-range="0-1000" class="range-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+            0〜1000 (重み付)
+          </button>
+          <button type="button" data-range="0-100" class="range-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100">
+            0〜100 (必須)
+          </button>
+          <button type="button" data-range="70-99" class="range-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100">
+            70〜99 (集中特訓)
+          </button>
+          <button type="button" data-range="100-1000" class="range-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100">
+            100〜1000 (3ケタ)
+          </button>
+          <button type="button" data-range="0-69" class="range-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100">
+            0〜69 (基礎)
+          </button>
+          <button type="button" data-range="weak" class="range-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100">
+            🔥 苦手のみ (<span id="weakCountBadge">0</span>)
+          </button>
+        </div>
+
+        <!-- Mini Session Scoreboard -->
+        <div class="flex items-center gap-3 text-xs text-slate-600 ml-auto">
+          <div>連続正解: <strong id="streakValue" class="text-slate-900 font-bold">0</strong></div>
+          <div>正答率: <strong id="accuracyValue" class="text-slate-900 font-bold">--%</strong> (<span id="totalSolvedValue">0</span>問)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Question & Interaction Card -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6 flex flex-col justify-between gap-4 relative overflow-hidden">
+
+      <!-- Card Top Meta Row -->
+      <div class="flex items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="currentCategoryBadge" class="px-2.5 py-0.5 rounded-full font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+            カテゴリ3：変則2ケタ (70〜99)
+          </span>
+          <span id="currentWeightBadge" class="px-2 py-0.5 rounded-full text-slate-500 bg-slate-100">
+            苦手倍率: ×1.0
+          </span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-500 font-mono">
+          <span>⏱️ <span id="timerDisplay">0.0</span>s</span>
+        </div>
+      </div>
+
+      <!-- Prompt Display Area -->
+      <div class="py-4 sm:py-6 flex flex-col items-center justify-center text-center min-h-[150px] sm:min-h-[175px]">
+        <!-- Mode Instruction Subtitle -->
+        <p id="questionInstruction" class="text-xs sm:text-sm font-medium text-slate-500 mb-2">
+          この数字をフランス語で発音してください
+        </p>
+
+        <!-- Prompt Primary Text (Number or French Spelling) -->
+        <div id="promptPrimaryText" class="text-5xl sm:text-7xl font-extrabold tracking-tight text-slate-900 select-all">
+          72
+        </div>
+
+        <!-- Listening Mode Audio Controls (Shown prominently in Mode C or anytime for audio replay) -->
+        <div id="listeningControlsArea" class="mt-4 flex items-center justify-center gap-2.5">
+          <button id="btnPlayNormalAudio" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"/></svg>
+            <span id="btnPlayNormalLabel">音声を聞く (Space)</span>
+          </button>
+          <button id="btnPlaySlowAudio" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all" title="0.7倍速でゆっくり再生">
+            <span>🐢 ゆっくり (0.7x)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode A: Speech Recognition Input Area -->
+      <div id="speakModeInputSection" class="flex flex-col items-center gap-3 pt-1">
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
+          <button id="btnStartMic" type="button" class="w-full sm:w-auto min-w-[230px] inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl text-sm sm:text-base font-bold bg-red-600 hover:bg-red-700 text-white shadow-md transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+            <span id="micButtonLabel">マイクで発音判定 (Space)</span>
+          </button>
+
+          <label class="inline-flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+            <input id="chkAutoStartMic" type="checkbox" class="rounded text-blue-600 focus:ring-blue-500" />
+            <span>出題時に自動でマイクON</span>
+          </label>
+        </div>
+
+        <!-- Recognized Speech Live Transcript Box -->
+        <div id="speechTranscriptBox" class="w-full max-w-md bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-center text-xs sm:text-sm text-slate-600 min-h-[38px] flex items-center justify-center">
+          <span id="speechTranscriptText">マイクボタンを押してフランス語で数字を発音してください</span>
+        </div>
+
+        <!-- Fallback Self-Grading Controls (for noisy environments or non-STT browsers) -->
+        <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+          <button id="btnRevealAnswerSpeak" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">
+            👀 答えと音声を確認する
+          </button>
+          <button id="btnManualPassSpeak" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors">
+            ⭕ 言えた（自己判定で正解）
+          </button>
+          <button id="btnManualFailSpeak" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors">
+            ❌ 言えなかった（苦手登録）
+          </button>
+        </div>
+      </div>
+
+      <!-- Mode B & C: Numeric Input & On-Screen Numpad Section -->
+      <div id="numberInputSection" class="hidden flex-col items-center gap-3 w-full max-w-sm mx-auto">
+        <div class="flex items-center gap-2 w-full">
+          <input
+            id="numericAnswerInput"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="数字を入力 (0〜1000)"
+            class="flex-1 text-center text-2xl sm:text-3xl font-bold py-2.5 px-4 rounded-xl border-2 border-slate-300 focus:border-blue-600 focus:outline-none bg-slate-50 text-slate-900 tracking-wider"
+          />
+          <button id="btnSubmitNumber" type="button" class="px-5 py-3 rounded-xl text-sm sm:text-base font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors shrink-0">
+            判定 (Enter)
+          </button>
+        </div>
+
+        <!-- Built-in Responsive Touch Numpad (Great for Smartphone & Quick Clicking) -->
+        <div class="grid grid-cols-3 gap-2 w-full pt-1 select-none" aria-label="数字テンキー">
+          <button type="button" data-numpad="7" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">7</button>
+          <button type="button" data-numpad="8" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">8</button>
+          <button type="button" data-numpad="9" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">9</button>
+          <button type="button" data-numpad="4" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">4</button>
+          <button type="button" data-numpad="5" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">5</button>
+          <button type="button" data-numpad="6" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">6</button>
+          <button type="button" data-numpad="1" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">1</button>
+          <button type="button" data-numpad="2" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">2</button>
+          <button type="button" data-numpad="3" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">3</button>
+          <button type="button" data-numpad="clear" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200">クリア (C)</button>
+          <button type="button" data-numpad="0" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80">0</button>
+          <button type="button" data-numpad="back" class="numpad-btn py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700">⌫ 1文字消す</button>
+        </div>
+
+        <button id="btnGiveUpNumber" type="button" class="text-xs text-slate-500 hover:text-slate-800 underline pt-1">
+          わからないので答えを見る
+        </button>
+      </div>
+
+      <!-- Feedback & Explanation Drawer (Shown after answering) -->
+      <div id="feedbackPanel" class="hidden rounded-2xl p-4 border transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span id="feedbackBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold">正解！</span>
+              <span id="feedbackLatencyText" class="text-xs text-slate-500">回答時間: 1.8秒</span>
+            </div>
+            <div class="flex flex-wrap items-baseline gap-2.5 pt-0.5">
+              <span id="feedbackNumberText" class="text-2xl sm:text-3xl font-extrabold text-slate-900">72</span>
+              <span class="text-slate-400">=</span>
+              <span id="feedbackSpellingText" class="text-xl sm:text-2xl font-bold text-blue-700">soixante-douze</span>
+              <span id="feedbackKanaText" class="text-xs sm:text-sm text-slate-600 font-medium">（ソワサント・ドゥーズ）</span>
+            </div>
+            <p id="feedbackBreakdownText" class="text-xs sm:text-sm text-slate-700 bg-white/80 rounded-lg px-3 py-1.5 border border-slate-200/80 mt-1">
+              構造分解: 60 (soixante) + 12 (douze)
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <button id="btnReplayFeedbackAudio" type="button" class="px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 shadow-sm">
+              🔊 発音確認
+            </button>
+            <button id="btnNextQuestion" type="button" class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-sm">
+              次の問題へ (Enter) →
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Bottom Probability Distribution & Keyboard Hint Bar -->
+    <section class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex flex-col gap-2">
+      <div class="flex items-center justify-between text-xs text-slate-600">
+        <span class="font-semibold text-slate-700">現在の2段階カテゴリ出題確率（全範囲モード時）</span>
+        <button id="btnQuickEditWeights" type="button" class="text-blue-600 hover:underline font-medium">比率を変更</button>
+      </div>
+      <!-- Visual Stacked Bar -->
+      <div class="h-2.5 w-full rounded-full overflow-hidden flex bg-slate-100">
+        <div id="barWeightBasic" class="bg-emerald-500 transition-all" style="width: 15%" title="基礎 (0〜16, 100)"></div>
+        <div id="barWeightStd2" class="bg-blue-500 transition-all" style="width: 25%" title="標準2ケタ (17〜69)"></div>
+        <div id="barWeightVar2" class="bg-amber-500 transition-all" style="width: 35%" title="変則2ケタ (70〜99)"></div>
+        <div id="barWeightDigit3" class="bg-purple-500 transition-all" style="width: 25%" title="3ケタ応用 (101〜1000)"></div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[11px] text-slate-600 pt-0.5">
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 shrink-0"></span><span>基礎 0-16,100: <strong id="lblWeightBasic">15%</strong></span></div>
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-blue-500 shrink-0"></span><span>標準 17-69: <strong id="lblWeightStd2">25%</strong></span></div>
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500 shrink-0"></span><span>重点 70-99: <strong id="lblWeightVar2">35%</strong></span></div>
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-purple-500 shrink-0"></span><span>3ケタ 101-1000: <strong id="lblWeightDigit3">25%</strong></span></div>
+      </div>
+      <div class="text-[11px] text-slate-400 hidden sm:flex items-center justify-between border-t border-slate-100 pt-1.5 mt-0.5">
+        <span>⌨️ PCショートカット: <kbd class="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">0-9</kbd> 数字入力 / <kbd class="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">Enter</kbd> 判定・次へ / <kbd class="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">Space</kbd> 音声再生・マイク開始</span>
+        <span id="lastSyncedTimestampText">ローカル自動保存有効</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- MODAL 1: Automatic Cloud Sync & GitHub Pages Guide                -->
+  <!-- ================================================================= -->
+  <div id="syncModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 flex flex-col">
+      <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">☁️ PC・スマホ全自動データ同期 & GitHub Pages設定</h2>
+          <p class="text-xs text-slate-500">初回にトークンを1回登録するだけで、以後は問題回答・アプリ起動のたびに全自動で同期されます</p>
+        </div>
+        <button id="btnCloseSyncModal" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">✕</button>
+      </div>
+
+      <div class="p-5 space-y-5 text-xs sm:text-sm text-slate-700">
+        <!-- Why & How Explanation Banner -->
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 space-y-1.5">
+          <div class="font-bold text-blue-900 flex items-center gap-1.5">
+            <span>💡 なぜ GitHub アカウントだけで全自動連携できるのか？</span>
+          </div>
+          <p class="text-blue-800 leading-relaxed text-xs">
+            アプリ本体を <strong>GitHub Pages</strong> に置くとPCとスマホから同じURLで開けます。さらに下に <strong>GitHubのトークン（Gist権限のみ）</strong> を1度入れておくと、アプリがあなたのGitHub内に非公開データファイル（<code>french_number_trainer_sync.json</code>）を<strong>自動作成・自動検出</strong>し、問題を1問解くごとに裏側で自動同期します。手動でのQR読み取りやエクスポート操作は一切不要です。
+          </p>
+        </div>
+
+        <!-- Token Input Form -->
+        <div class="space-y-3">
+          <div>
+            <label for="inputGithubToken" class="block font-semibold text-slate-800 mb-1">
+              GitHub Personal Access Token（初回のみ入力）
+            </label>
+            <input
+              id="inputGithubToken"
+              type="password"
+              autocomplete="off"
+              placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:outline-none font-mono text-xs bg-slate-50"
+            />
+            <p class="text-[11px] text-slate-500 mt-1">
+              ※GitHubの Settings → Developer settings → Personal access tokens (Classic) で <strong><code>gist</code> にだけチェック</strong>を入れて発行したトークンを貼り付けてください。
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div class="text-xs space-y-0.5">
+              <div class="font-semibold text-slate-800">自動検出された同期Gist ID:</div>
+              <div id="displayGistId" class="font-mono text-slate-500 text-[11px]">未接続（トークン保存時に自動検索・新規作成します）</div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button id="btnConnectAutoSync" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
+                自動同期を有効化・接続
+              </button>
+              <button id="btnDisconnectSync" type="button" class="px-3 py-2 rounded-xl text-xs font-medium bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors">
+                解除
+              </button>
+            </div>
+          </div>
+
+          <div id="syncModalFeedbackMsg" class="hidden rounded-xl p-3 text-xs font-medium"></div>
+        </div>
+
+        <!-- Step-by-Step GitHub Pages Setup Guide -->
+        <div class="border-t border-slate-200 pt-4 space-y-2.5">
+          <h3 class="font-bold text-slate-900 text-sm">📱 スマホとPCで使うための GitHub Pages 公開手順（約3分・無料）</h3>
+          <ol class="list-decimal list-inside space-y-2 text-xs text-slate-600 leading-relaxed">
+            <li>
+              <strong>リポジトリ作成</strong>：GitHubで新しいリポジトリ（例：<code>french-numbers</code>）を作成し、このアプリのHTMLファイルを <strong><code>index.html</code></strong> という名前にしてアップロード（Commit）します。
+            </li>
+            <li>
+              <strong>GitHub Pages有効化</strong>：リポジトリの <strong>Settings → Pages</strong> を開き、Branch を <code>main</code>（<code>/root</code>）にして Save を押すと、<code>https://あなたのID.github.io/french-numbers/</code> という専用URLが発行されます。
+            </li>
+            <li>
+              <strong>PCとスマホでトークンを1回入力</strong>：PCとスマホのブラウザでそのURLを開き、この画面に同じ GitHub トークンを1回貼り付ければ準備完了です。以後は<strong>アプリを開くたび・問題を解くたびに2台のデータが全自動で同期</strong>されます。
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- MODAL 2: Category Weights & Audio Settings                        -->
+  <!-- ================================================================= -->
+  <div id="weightsModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 flex flex-col">
+      <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">⚖️ 出題重み付け・3ケタ配分設定</h2>
+          <p class="text-xs text-slate-500">3ケタ台に埋もれず2ケタ台を反復するための2段階抽選比率を調整できます</p>
+        </div>
+        <button id="btnCloseWeightsModal" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">✕</button>
+      </div>
+
+      <div class="p-5 space-y-5 text-xs sm:text-sm">
+        <!-- Stage 1 Category Weights -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-slate-900">第1段階：カテゴリ別出題ウェイト（0〜1000総合モード時）</h3>
+            <button id="btnResetDefaultWeights" type="button" class="text-xs text-blue-600 hover:underline">推奨初期値に戻す</button>
+          </div>
+
+          <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <div>
+              <div class="flex justify-between text-xs font-medium mb-1">
+                <span>🟢 カテゴリ1：基礎・固有形 (0〜16, 100)［18個］</span>
+                <span id="valSliderBasic" class="font-bold text-emerald-700">15%</span>
+              </div>
+              <input id="sliderWeightBasic" type="range" min="5" max="60" step="5" value="15" class="w-full accent-emerald-600" />
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-medium mb-1">
+                <span>🔵 カテゴリ2：標準2ケタ (17〜69)［53個］</span>
+                <span id="valSliderStd2" class="font-bold text-blue-700">25%</span>
+              </div>
+              <input id="sliderWeightStd2" type="range" min="5" max="60" step="5" value="25" class="w-full accent-blue-600" />
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-medium mb-1">
+                <span>🟠 カテゴリ3：変則2ケタ・二十進法 (70〜99)［30個］</span>
+                <span id="valSliderVar2" class="font-bold text-amber-700">35%</span>
+              </div>
+              <input id="sliderWeightVar2" type="range" min="10" max="70" step="5" value="35" class="w-full accent-amber-600" />
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-medium mb-1">
+                <span>🟣 カテゴリ4：3ケタ応用 (101〜1000)［900個］</span>
+                <span id="valSliderDigit3" class="font-bold text-purple-700">25%</span>
+              </div>
+              <input id="sliderWeightDigit3" type="range" min="0" max="60" step="5" value="25" class="w-full accent-purple-600" />
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500">
+            ※スライダーの合計値は自動で100%に正規化されて抽選されます。さらにカテゴリ4（3ケタ）内でも「百の倍数（200, 300...）：25%」「101〜199＆X01〜X09：25%」「X70〜X99：30%」「その他：20%」のサブ重みで重要ルールが優先出題されます。
+          </p>
+        </div>
+
+        <!-- Audio & French Voice Selector -->
+        <div class="border-t border-slate-200 pt-4 space-y-3">
+          <h3 class="font-bold text-slate-900">🔊 フランス語音声（TTS）設定</h3>
+          <div>
+            <label for="selectFrenchVoice" class="block text-xs font-medium text-slate-700 mb-1">使用するフランス語音声エンジン (fr-FR)</label>
+            <select id="selectFrenchVoice" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-slate-50">
+              <option value="">システムのデフォルト標準フランス語 (fr-FR)</option>
+            </select>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-700">回答判定後に自動でお手本音声を再生する</span>
+            <input id="chkAutoPlayFeedbackAudio" type="checkbox" checked class="rounded text-blue-600 focus:ring-blue-500 h-4 w-4" />
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end">
+          <button id="btnSaveWeightsModal" type="button" class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white">
+            設定を保存して閉じる
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- MODAL 3: Learning Stats, Weak Numbers & Reference Table           -->
+  <!-- ================================================================= -->
+  <div id="statsModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 flex flex-col">
+      <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">📊 学習統計・苦手数字リスト＆早見表</h2>
+          <p class="text-xs text-slate-500">間違えた数字や回答に5秒以上かかった数字は自動で苦手倍率が上がります</p>
+        </div>
+        <button id="btnCloseStatsModal" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">✕</button>
+      </div>
+
+      <div class="p-5 space-y-5 text-xs sm:text-sm">
+        <!-- Summary KPI Cards -->
+        <div class="grid grid-cols-3 gap-2.5 text-center">
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div class="text-[11px] text-slate-500">学習済みユニーク数字</div>
+            <div id="statUniqueCount" class="text-xl font-extrabold text-slate-900 mt-0.5">0</div>
+          </div>
+          <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+            <div class="text-[11px] text-emerald-700">累計正解数</div>
+            <div id="statTotalOkCount" class="text-xl font-extrabold text-emerald-800 mt-0.5">0</div>
+          </div>
+          <div class="bg-rose-50 p-3 rounded-xl border border-rose-200">
+            <div class="text-[11px] text-rose-700">重点復習対象 (倍率>1.2)</div>
+            <div id="statWeakItemsCount" class="text-xl font-extrabold text-rose-800 mt-0.5">0</div>
+          </div>
+        </div>
+
+        <!-- Weak Numbers Table -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-slate-900">🔥 現在の苦手・重点出題数字トップ15</h3>
+            <button id="btnResetStatsConfirm" type="button" class="text-xs text-rose-600 hover:underline">履歴をリセット</button>
+          </div>
+          <div id="resetConfirmBar" class="hidden bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-center justify-between">
+            <span class="text-xs text-rose-800 font-medium">本当にすべての学習履歴を初期化しますか？</span>
+            <div class="flex gap-2">
+              <button id="btnExecuteResetStats" type="button" class="px-3 py-1 rounded-lg bg-rose-600 text-white text-xs font-bold">初期化する</button>
+              <button id="btnCancelResetStats" type="button" class="px-3 py-1 rounded-lg bg-white text-slate-700 border border-slate-300 text-xs">キャンセル</button>
+            </div>
+          </div>
+          <div class="border border-slate-200 rounded-xl overflow-hidden max-h-56 overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-100 text-slate-600 sticky top-0">
+                <tr>
+                  <th class="py-2 px-3">数字</th>
+                  <th class="py-2 px-3">標準フランス語綴り</th>
+                  <th class="py-2 px-3 text-right">正/誤</th>
+                  <th class="py-2 px-3 text-right">出題倍率</th>
+                  <th class="py-2 px-3 text-center">音声</th>
+                </tr>
+              </thead>
+              <tbody id="weakNumbersTableBody" class="divide-y divide-slate-100">
+                <tr>
+                  <td colspan="5" class="py-4 text-center text-slate-400">まだ学習履歴がありません。問題を解くと自動で記録されます。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Interactive Number Lookup / Converter (0-1000) -->
+        <div class="border-t border-slate-200 pt-4 space-y-2.5">
+          <h3 class="font-bold text-slate-900">🔍 0〜1000 フランス語綴り＆構造リファレンス検索</h3>
+          <div class="flex items-center gap-2">
+            <input
+              id="lookupNumberInput"
+              type="number"
+              min="0"
+              max="1000"
+              value="72"
+              placeholder="0〜1000の数字を入力"
+              class="w-32 px-3 py-2 rounded-xl border border-slate-300 font-bold text-sm bg-slate-50"
+            />
+            <button id="btnLookupPlayAudio" type="button" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold">
+              🔊 発音を聞く
+            </button>
+            <div id="lookupResultBox" class="flex-1 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200 text-xs">
+              <strong class="text-blue-700 text-sm">soixante-douze</strong> <span class="text-slate-500">（60 + 12）</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBanner" class="fixed bottom-4 right-4 z-50 hidden bg-slate-900 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 transition-all">
+    <span id="toastBannerText">同期完了</span>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. French Number Linguistic Engine (Standard French 0 - 1000)
+      // =========================================================================
+      const UNITS_AND_TEENS = [
+        'zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf',
+        'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize',
+        'dix-sept', 'dix-huit', 'dix-neuf'
+      ];
+
+      const TENS_WORDS = {
+        20: 'vingt',
+        30: 'trente',
+        40: 'quarante',
+        50: 'cinquante',
+        60: 'soixante'
+      };
+
+      const KANA_UNITS = [
+        'ゼロ', 'アン', 'ドゥ', 'トロワ', 'キャトル', 'サンク', 'シス', 'セット', 'ユイット', 'ヌフ',
+        'ディス', 'オンズ', 'ドゥーズ', 'トレーズ', 'キャトルズ', 'キャーンズ', 'セーズ',
+        'ディセット', 'ディズュイット', 'ディズヌフ'
+      ];
+
+      const KANA_TENS = {
+        20: 'ヴァン',
+        30: 'トラント',
+        40: 'キャラント',
+        50: 'サンカント',
+        60: 'ソワサント'
+      };
+
+      function spellUnder100(n) {
+        if (n < 20) {
+          return UNITS_AND_TEENS[n];
+        }
+        if (n < 70) {
+          const ten = Math.floor(n / 10) * 10;
+          const unit = n % 10;
+          if (unit === 0) return TENS_WORDS[ten];
+          if (unit === 1) return TENS_WORDS[ten] + ' et un';
+          return TENS_WORDS[ten] + '-' + UNITS_AND_TEENS[unit];
+        }
+        if (n < 80) {
+          const rem = n - 60; // 10..19
+          if (n === 71) return 'soixante et onze';
+          return 'soixante-' + UNITS_AND_TEENS[rem];
+        }
+        // 80..99
+        if (n === 80) return 'quatre-vingts';
+        const rem = n - 80; // 1..19
+        return 'quatre-vingt-' + UNITS_AND_TEENS[rem];
+      }
+
+      function kanaUnder100(n) {
+        if (n < 20) return KANA_UNITS[n];
+        if (n < 70) {
+          const ten = Math.floor(n / 10) * 10;
+          const unit = n % 10;
+          if (unit === 0) return KANA_TENS[ten];
+          if (unit === 1) return KANA_TENS[ten] + '・テ・アン';
+          return KANA_TENS[ten] + '・' + KANA_UNITS[unit];
+        }
+        if (n < 80) {
+          if (n === 71) return 'ソワサン・テ・オンズ';
+          return 'ソワサント・' + KANA_UNITS[n - 60];
+        }
+        if (n === 80) return 'キャトル・ヴァン';
+        return 'キャトル・ヴァン・' + KANA_UNITS[n - 80];
+      }
+
+      function getFrenchNumberInfo(n) {
+        n = Math.max(0, Math.min(1000, Math.floor(n)));
+        let spelling = '';
+        let kana = '';
+        let breakdown = '';
+        let category = '';
+        let categoryLabel = '';
+        let subCategory = '';
+
+        if (n === 1000) {
+          spelling = 'mille';
+          kana = 'ミル';
+          breakdown = '1000 = mille（不変化・unは不要）';
+          category = 'digit3';
+          categoryLabel = 'カテゴリ4：3ケタ・1000応用';
+          subCategory = 'exact100';
+          return { number: n, spelling, kana, breakdown, category, categoryLabel, subCategory };
+        }
+
+        if (n < 100) {
+          spelling = spellUnder100(n);
+          kana = kanaUnder100(n);
+          if (n <= 16) {
+            category = 'basic';
+            categoryLabel = 'カテゴリ1：基礎・固有形 (0〜16, 100)';
+            breakdown = n + ' = 固有語彙（そのまま暗記）';
+          } else if (n <= 69) {
+            category = 'std2';
+            categoryLabel = 'カテゴリ2：標準2ケタ (17〜69)';
+            const ten = Math.floor(n / 10) * 10;
+            const u = n % 10;
+            if (u === 0) {
+              breakdown = ten + ' (' + TENS_WORDS[ten] + ')';
+            } else if (u === 1) {
+              breakdown = ten + ' (' + TENS_WORDS[ten] + ') + et + 1 (un) ※一の位が1のため et で連結';
+            } else {
+              breakdown = ten + ' (' + TENS_WORDS[ten] + ') + ' + u + ' (' + UNITS_AND_TEENS[u] + ')';
+            }
+          } else {
+            category = 'var2';
+            categoryLabel = 'カテゴリ3：変則2ケタ・二十進法 (70〜99)';
+            if (n < 80) {
+              const rem = n - 60;
+              breakdown = '60 (soixante) + ' + (n === 71 ? 'et + ' : '') + rem + ' (' + UNITS_AND_TEENS[rem] + ')';
+            } else if (n === 80) {
+              breakdown = '4 (quatre) × 20 (vingts) ※端数がないため末尾に複数形 -s';
+            } else {
+              const rem = n - 80;
+              breakdown = '4 × 20 (quatre-vingt) + ' + rem + ' (' + UNITS_AND_TEENS[rem] + ') ※後ろに続くため -s なし・et なし';
+            }
+          }
+          return { number: n, spelling, kana, breakdown, category, categoryLabel, subCategory: 'none' };
+        }
+
+        if (n === 100) {
+          return {
+            number: 100,
+            spelling: 'cent',
+            kana: 'サン',
+            breakdown: '100 = cent（※前に un はつけない）',
+            category: 'basic',
+            categoryLabel: 'カテゴリ1：基礎・固有形 (0〜16, 100)',
+            subCategory: 'exact100'
+          };
+        }
+
+        // 101..999
+        category = 'digit3';
+        categoryLabel = 'カテゴリ4：3ケタ応用 (101〜999)';
+        const h = Math.floor(n / 100);
+        const rem = n % 100;
+        const hPrefix = h === 1 ? 'cent' : UNITS_AND_TEENS[h] + (rem === 0 ? ' cents' : ' cent');
+        const hKanaPrefix = h === 1 ? 'サン' : KANA_UNITS[h] + '・サン';
+
+        if (rem === 0) {
+          spelling = hPrefix;
+          kana = hKanaPrefix;
+          breakdown = h + ' (' + UNITS_AND_TEENS[h] + ') × 100 (cents) ※端数がない百の倍数のため複数形 -s がつく';
+          subCategory = 'exact100';
+        } else {
+          const remSpell = spellUnder100(rem);
+          const remKana = kanaUnder100(rem);
+          spelling = hPrefix + ' ' + remSpell;
+          kana = hKanaPrefix + '・' + remKana;
+          const hundredExplain = h === 1
+            ? '100 (cent ※un不要)'
+            : (h * 100) + ' (' + UNITS_AND_TEENS[h] + ' cent ※後ろに続くため -s 消失)';
+          breakdown = hundredExplain + ' + ' + rem + ' (' + remSpell + ')';
+
+          if (h === 1 || rem <= 9) {
+            subCategory = 'hundred_rule';
+          } else if (rem >= 70) {
+            subCategory = 'hundred_var2';
+          } else {
+            subCategory = 'hundred_std';
+          }
+        }
+
+        return { number: n, spelling, kana, breakdown, category, categoryLabel, subCategory };
+      }
+
+      // =========================================================================
+      // 2. Speech Recognition Normalizer & French Spoken Number Parser
+      // =========================================================================
+      function normalizeFrenchString(str) {
+        return String(str || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/['’\-_,.;:!?()]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      const WORD_TO_VAL = {
+        'zero': 0,
+        'un': 1, 'une': 1, 'hein': 1, 'lun': 1,
+        'deux': 2, 'de': 2, 'deuxieme': 2, 'd': 2,
+        'trois': 3, 'troi': 3,
+        'quatre': 4, 'cat': 4,
+        'cinq': 5, 'saint': 5, 'sein': 5,
+        'six': 6, 'sis': 6, 'ci': 6, 'scie': 6,
+        'sept': 7, 'cette': 7, 'set': 7, 'cet': 7,
+        'huit': 8, 'huite': 8, 'huitres': 8, 'oui': 8,
+        'neuf': 9, 'oeuf': 9,
+        'dix': 10, 'dis': 10, 'dice': 10,
+        'onze': 11,
+        'douze': 12,
+        'treize': 13,
+        'quatorze': 14,
+        'quinze': 15,
+        'seize': 16,
+        'vingt': 20, 'vingts': 20, 'vin': 20, 'vins': 20, 'vain': 20, 'vint': 20,
+        'trente': 30,
+        'quarante': 40,
+        'cinquante': 50,
+        'soixante': 60,
+        'cent': 100, 'cents': 100, 'sans': 100, 'sang': 100, 'sens': 100, 'sen': 100,
+        'mille': 1000, 'mil': 1000, 'miles': 1000
+      };
+
+      function parseSpokenFrenchToNumber(rawTranscript) {
+        const norm = normalizeFrenchString(rawTranscript);
+        if (!norm) return null;
+
+        // If purely digits
+        if (/^\d+$/.test(norm)) {
+          return parseInt(norm, 10);
+        }
+
+        const tokens = norm.split(' ');
+        let total = 0;
+        let current = 0;
+        let matchedAny = false;
+
+        for (let i = 0; i < tokens.length; i++) {
+          const tk = tokens[i];
+          if (tk === 'et' || tk === 'le' || tk === 'la' || tk === 'les' || tk === 'numero') {
+            continue;
+          }
+          if (/^\d+$/.test(tk)) {
+            const dVal = parseInt(tk, 10);
+            current += dVal;
+            matchedAny = true;
+            continue;
+          }
+          if (Object.prototype.hasOwnProperty.call(WORD_TO_VAL, tk)) {
+            const val = WORD_TO_VAL[tk];
+            matchedAny = true;
+            if (val === 1000) {
+              current = (current === 0 ? 1 : current) * 1000;
+              total += current;
+              current = 0;
+            } else if (val === 100) {
+              current = (current === 0 ? 1 : current) * 100;
+            } else if (val === 20 && current === 4) {
+              current = 80;
+            } else if (val === 20 && (current % 100) === 4) {
+              current = (current - 4) + 80;
+            } else {
+              current += val;
+            }
+          }
+        }
+
+        if (!matchedAny) return null;
+        return total + current;
+      }
+
+      function isSpeechMatch(alternativesList, targetNumber) {
+        const targetInfo = getFrenchNumberInfo(targetNumber);
+        const normTargetSpelling = normalizeFrenchString(targetInfo.spelling);
+        const normTargetNoEt = normTargetSpelling.replace(/\bet\b/g, '').replace(/\s+/g, ' ').trim();
+
+        for (let i = 0; i < alternativesList.length; i++) {
+          const candidate = alternativesList[i];
+          const normCand = normalizeFrenchString(candidate);
+          if (!normCand) continue;
+
+          // 1. Direct normalized text match
+          if (normCand === normTargetSpelling || normCand === normTargetNoEt) {
+            return { matched: true, recognizedText: candidate };
+          }
+
+          // 2. Direct embedded number match (e.g. "72")
+          const parsedNum = parseSpokenFrenchToNumber(candidate);
+          if (parsedNum === targetNumber) {
+            return { matched: true, recognizedText: candidate };
+          }
+        }
+        return { matched: false, recognizedText: alternativesList[0] || '' };
+      }
+
+      // =========================================================================
+      // 3. State Management, LocalStorage & Automatic GitHub Cloud Sync
+      // =========================================================================
+      const STORAGE_KEY = 'french_number_trainer_state_v3';
+      const SYNC_FILENAME = 'french_number_trainer_sync.json';
+
+      const defaultState = {
+        version: 3,
+        updatedAt: 0,
+        mode: 'speak', // 'speak' | 'read' | 'listen' | 'mix'
+        rangePreset: '0-1000',
+        autoStartMic: false,
+        autoPlayFeedbackAudio: true,
+        preferredVoiceURI: '',
+        weights: {
+          basic: 15,
+          std2: 25,
+          var2: 35,
+          digit3: 25
+        },
+        stats: {}, // { [number]: { ok, ng, avgMs, weight, updatedAt } }
+        syncConfig: {
+          githubToken: '',
+          gistId: '',
+          lastSyncTime: 0
+        }
+      };
+
+      let appState = loadLocalState();
+      let sessionStreak = 0;
+      let sessionOk = 0;
+      let sessionTotal = 0;
+      let recentHistory = [];
+      let currentQuestion = null; // { number, info, activeMode, startTimeMs, answered }
+      let timerInterval = null;
+      let autoPushTimer = null;
+      let lastAutoPullMs = 0;
+      let isSyncInProgress = false;
+
+      function loadLocalState() {
+        try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw) return JSON.parse(JSON.stringify(defaultState));
+          const parsed = JSON.parse(raw);
+          return {
+            ...JSON.parse(JSON.stringify(defaultState)),
+            ...parsed,
+            weights: { ...defaultState.weights, ...(parsed.weights || {}) },
+            stats: parsed.stats || {},
+            syncConfig: { ...defaultState.syncConfig, ...(parsed.syncConfig || {}) }
+          };
+        } catch (err) {
+          return JSON.parse(JSON.stringify(defaultState));
+        }
+      }
+
+      function saveLocalState(triggerCloudPush) {
+        appState.updatedAt = Date.now();
+        try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        } catch (err) {
+          // Ignore sandbox storage quota errors
+        }
+        if (triggerCloudPush && appState.syncConfig.githubToken) {
+          scheduleAutoCloudPush();
+        }
+      }
+
+      function showToast(msg) {
+        const banner = document.getElementById('toastBanner');
+        const text = document.getElementById('toastBannerText');
+        if (!banner || !text) return;
+        text.textContent = msg;
+        banner.classList.remove('hidden');
+        setTimeout(() => {
+          banner.classList.add('hidden');
+        }, 2800);
+      }
+
+      function updateSyncStatusBadge(stateType, labelText) {
+        const dot = document.getElementById('syncStatusDot');
+        const txt = document.getElementById('syncStatusText');
+        const footerTxt = document.getElementById('lastSyncedTimestampText');
+        if (!dot || !txt) return;
+
+        dot.className = 'w-2 h-2 rounded-full ';
+        if (stateType === 'synced') {
+          dot.className += 'bg-emerald-500';
+        } else if (stateType === 'syncing') {
+          dot.className += 'bg-blue-500 animate-ping';
+        } else if (stateType === 'error') {
+          dot.className += 'bg-rose-500';
+        } else {
+          dot.className += 'bg-slate-400';
+        }
+        txt.textContent = labelText;
+
+        if (footerTxt && appState.syncConfig.lastSyncTime > 0) {
+          const d = new Date(appState.syncConfig.lastSyncTime);
+          const timeStr = d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          footerTxt.textContent = '☁️ 最終自動同期: ' + timeStr;
+        }
+      }
+
+      // Smart per-number timestamp merge between Local & Cloud
+      function mergeCloudPayloadIntoLocal(cloudData) {
+        if (!cloudData || typeof cloudData !== 'object') return false;
+        let hasChanges = false;
+
+        if (cloudData.weights && (cloudData.updatedAt || 0) > (appState.updatedAt || 0)) {
+          appState.weights = { ...appState.weights, ...cloudData.weights };
+          hasChanges = true;
+        }
+
+        const cloudStats = cloudData.stats || {};
+        const allKeys = new Set([...Object.keys(appState.stats), ...Object.keys(cloudStats)]);
+
+        allKeys.forEach((key) => {
+          const localItem = appState.stats[key];
+          const cloudItem = cloudStats[key];
+          if (!localItem && cloudItem) {
+            appState.stats[key] = { ...cloudItem };
+            hasChanges = true;
+          } else if (localItem && cloudItem) {
+            const localTime = localItem.updatedAt || 0;
+            const cloudTime = cloudItem.updatedAt || 0;
+            if (cloudTime > localTime) {
+              appState.stats[key] = {
+                ok: Math.max(localItem.ok || 0, cloudItem.ok || 0),
+                ng: Math.max(localItem.ng || 0, cloudItem.ng || 0),
+                avgMs: cloudItem.avgMs || localItem.avgMs || 2500,
+                weight: cloudItem.weight || 1.0,
+                updatedAt: cloudTime
+              };
+              hasChanges = true;
+            }
+          }
+        });
+
+        return hasChanges;
+      }
+
+      function buildCloudPayload() {
+        return {
+          version: 3,
+          updatedAt: appState.updatedAt || Date.now(),
+          weights: appState.weights,
+          stats: appState.stats
+        };
+      }
+
+      // Auto-discover existing secret Gist or create one automatically
+      async function ensureGistConnected(token) {
+        const headers = {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/vnd.github+json'
+        };
+
+        // 1. If gistId is already stored, verify it works
+        if (appState.syncConfig.gistId) {
+          const checkRes = await fetch('https://api.github.com/gists/' + appState.syncConfig.gistId + '?t=' + Date.now(), { headers });
+          if (checkRes.ok) {
+            return await checkRes.json();
+          }
+        }
+
+        // 2. Search user's gists for SYNC_FILENAME
+        const listRes = await fetch('https://api.github.com/gists?per_page=100&t=' + Date.now(), { headers });
+        if (!listRes.ok) {
+          throw new Error('GitHub API認証エラー (' + listRes.status + ')。トークンのgist権限を確認してください。');
+        }
+        const gists = await listRes.json();
+        const found = gists.find((g) => g.files && g.files[SYNC_FILENAME]);
+        if (found) {
+          appState.syncConfig.gistId = found.id;
+          const detailRes = await fetch('https://api.github.com/gists/' + found.id + '?t=' + Date.now(), { headers });
+          if (detailRes.ok) {
+            return await detailRes.json();
+          }
+        }
+
+        // 3. Not found -> Automatically create a new secret Gist
+        const createRes = await fetch('https://api.github.com/gists', {
+          method: 'POST',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            description: 'Chiffres Francais - French Number Trainer Auto-Sync Data',
+            public: false,
+            files: {
+              [SYNC_FILENAME]: {
+                content: JSON.stringify(buildCloudPayload(), null, 2)
+              }
+            }
+          })
+        });
+
+        if (!createRes.ok) {
+          throw new Error('同期用Gistの自動作成に失敗しました (' + createRes.status + ')');
+        }
+        const createdGist = await createRes.json();
+        appState.syncConfig.gistId = createdGist.id;
+        return createdGist;
+      }
+
+      async function performAutoCloudPull(silent) {
+        const token = (appState.syncConfig.githubToken || '').trim();
+        if (!token || isSyncInProgress) return;
+
+        isSyncInProgress = true;
+        updateSyncStatusBadge('syncing', '自動同期中...');
+
+        try {
+          const gistObj = await ensureGistConnected(token);
+          const fileEntry = gistObj.files && gistObj.files[SYNC_FILENAME];
+          if (fileEntry && fileEntry.content) {
+            const cloudData = JSON.parse(fileEntry.content);
+            const changed = mergeCloudPayloadIntoLocal(cloudData);
+            if (changed) {
+              saveLocalState(false);
+              refreshWeightUI();
+              refreshWeakCountBadge();
+            }
+          }
+          appState.syncConfig.lastSyncTime = Date.now();
+          lastAutoPullMs = Date.now();
+          saveLocalState(false);
+          updateSyncStatusBadge('synced', '自動同期: 完了');
+          const gistLabel = document.getElementById('displayGistId');
+          if (gistLabel) gistLabel.textContent = appState.syncConfig.gistId;
+          if (!silent) showToast('☁️ クラウドから最新データを自動同期しました');
+        } catch (err) {
+          updateSyncStatusBadge('error', '同期エラー');
+        } finally {
+          isSyncInProgress = false;
+        }
+      }
+
+      async function performAutoCloudPush() {
+        const token = (appState.syncConfig.githubToken || '').trim();
+        if (!token || isSyncInProgress) return;
+
+        isSyncInProgress = true;
+        updateSyncStatusBadge('syncing', '自動保存中...');
+
+        try {
+          if (!appState.syncConfig.gistId) {
+            await ensureGistConnected(token);
+          } else {
+            // Pull first to ensure we never overwrite newer changes from the other device
+            const headers = {
+              'Authorization': 'Bearer ' + token,
+              'Accept': 'application/vnd.github+json'
+            };
+            const getRes = await fetch('https://api.github.com/gists/' + appState.syncConfig.gistId + '?t=' + Date.now(), { headers });
+            if (getRes.ok) {
+              const remoteGist = await getRes.json();
+              const fileEntry = remoteGist.files && remoteGist.files[SYNC_FILENAME];
+              if (fileEntry && fileEntry.content) {
+                mergeCloudPayloadIntoLocal(JSON.parse(fileEntry.content));
+              }
+            }
+          }
+
+          const pushRes = await fetch('https://api.github.com/gists/' + appState.syncConfig.gistId, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Accept': 'application/vnd.github+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              files: {
+                [SYNC_FILENAME]: {
+                  content: JSON.stringify(buildCloudPayload(), null, 2)
+                }
+              }
+            })
+          });
+
+          if (!pushRes.ok) throw new Error('Push error ' + pushRes.status);
+          appState.syncConfig.lastSyncTime = Date.now();
+          saveLocalState(false);
+          updateSyncStatusBadge('synced', '自動同期: 完了');
+        } catch (err) {
+          updateSyncStatusBadge('error', '同期エラー');
+        } finally {
+          isSyncInProgress = false;
+        }
+      }
+
+      function scheduleAutoCloudPush() {
+        if (autoPushTimer) clearTimeout(autoPushTimer);
+        updateSyncStatusBadge('syncing', '同期待機中...');
+        autoPushTimer = setTimeout(() => {
+          performAutoCloudPush();
+        }, 1500);
+      }
+
+      // =========================================================================
+      // 4. Two-Stage Weighted Random Scheduler
+      // =========================================================================
+      function getNumberWeight(n) {
+        const rec = appState.stats[String(n)];
+        let w = rec && typeof rec.weight === 'number' ? rec.weight : 1.0;
+        // Slight boost for "et un" numbers (21, 31, 41, 51, 61, 71)
+        if (n >= 21 && n <= 71 && n % 10 === 1 && !rec) {
+          w *= 1.35;
+        }
+        return Math.max(0.4, Math.min(5.0, w));
+      }
+
+      function weightedPickFromArray(candidates) {
+        if (!candidates || candidates.length === 0) return 0;
+        const pool = candidates.filter((n) => !recentHistory.includes(n));
+        const activePool = pool.length > 0 ? pool : candidates;
+
+        let totalW = 0;
+        const weights = activePool.map((n) => {
+          const w = getNumberWeight(n);
+          totalW += w;
+          return w;
+        });
+
+        let r = Math.random() * totalW;
+        for (let i = 0; i < activePool.length; i++) {
+          r -= weights[i];
+          if (r <= 0) return activePool[i];
+        }
+        return activePool[activePool.length - 1];
+      }
+
+      const POOLS = {
+        basic: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 100],
+        std2: Array.from({ length: 53 }, (_, i) => i + 17), // 17..69
+        var2: Array.from({ length: 30 }, (_, i) => i + 70), // 70..99
+        digit3_exact100: [200, 300, 400, 500, 600, 700, 800, 900, 1000],
+        digit3_hundredRule: [],
+        digit3_var2: [],
+        digit3_std: []
+      };
+
+      for (let n = 101; n <= 999; n++) {
+        const rem = n % 100;
+        if (rem === 0) continue;
+        if (n < 200 || rem <= 9) {
+          POOLS.digit3_hundredRule.push(n);
+        } else if (rem >= 70) {
+          POOLS.digit3_var2.push(n);
+        } else {
+          POOLS.digit3_std.push(n);
+        }
+      }
+
+      function pickFromDigit3SubBuckets() {
+        const r = Math.random() * 100;
+        if (r < 25) return weightedPickFromArray(POOLS.digit3_exact100);
+        if (r < 50) return weightedPickFromArray(POOLS.digit3_hundredRule);
+        if (r < 80) return weightedPickFromArray(POOLS.digit3_var2);
+        return weightedPickFromArray(POOLS.digit3_std);
+      }
+
+      function pickNextQuestionNumber() {
+        const preset = appState.rangePreset;
+
+        if (preset === 'weak') {
+          const weakNums = Object.keys(appState.stats)
+            .map((k) => parseInt(k, 10))
+            .filter((n) => (appState.stats[String(n)].weight || 1.0) > 1.2 || (appState.stats[String(n)].ng || 0) > 0);
+          if (weakNums.length > 0) {
+            return weightedPickFromArray(weakNums);
+          }
+          // Fallback to 70-99 if no weak numbers yet
+          return weightedPickFromArray(POOLS.var2);
+        }
+
+        if (preset === '70-99') {
+          return weightedPickFromArray(POOLS.var2);
+        }
+
+        if (preset === '0-69') {
+          const basicUnder20 = POOLS.basic.filter((n) => n < 100);
+          return Math.random() < 0.35
+            ? weightedPickFromArray(basicUnder20)
+            : weightedPickFromArray(POOLS.std2);
+        }
+
+        if (preset === '100-1000') {
+          return pickFromDigit3SubBuckets();
+        }
+
+        if (preset === '0-100') {
+          // Normalize weights among basic, std2, var2
+          const w1 = appState.weights.basic;
+          const w2 = appState.weights.std2;
+          const w3 = appState.weights.var2;
+          const sum = w1 + w2 + w3 || 1;
+          const r = Math.random() * sum;
+          if (r < w1) return weightedPickFromArray(POOLS.basic);
+          if (r < w1 + w2) return weightedPickFromArray(POOLS.std2);
+          return weightedPickFromArray(POOLS.var2);
+        }
+
+        // Default: '0-1000' 2-stage weighted selection
+        const w1 = appState.weights.basic;
+        const w2 = appState.weights.std2;
+        const w3 = appState.weights.var2;
+        const w4 = appState.weights.digit3;
+        const sum = w1 + w2 + w3 + w4 || 1;
+        const r = Math.random() * sum;
+
+        if (r < w1) return weightedPickFromArray(POOLS.basic);
+        if (r < w1 + w2) return weightedPickFromArray(POOLS.std2);
+        if (r < w1 + w2 + w3) return weightedPickFromArray(POOLS.var2);
+        return pickFromDigit3SubBuckets();
+      }
+
+      // =========================================================================
+      // 5. Web Speech API Controller (TTS & STT)
+      // =========================================================================
+      let availableFrenchVoices = [];
+      let activeRecognition = null;
+      let isMicListening = false;
+
+      function initVoices() {
+        if (!('speechSynthesis' in window)) return;
+        const load = () => {
+          const all = window.speechSynthesis.getVoices() || [];
+          availableFrenchVoices = all.filter((v) => v.lang && v.lang.toLowerCase().startsWith('fr'));
+          const sel = document.getElementById('selectFrenchVoice');
+          if (!sel) return;
+          sel.innerHTML = '<option value="">システムのデフォルト標準フランス語 (fr-FR)</option>';
+          availableFrenchVoices.forEach((v) => {
+            const opt = document.createElement('option');
+            opt.value = v.voiceURI;
+            opt.textContent = v.name + ' (' + v.lang + ')';
+            if (v.voiceURI === appState.preferredVoiceURI) opt.selected = true;
+            sel.appendChild(opt);
+          });
+        };
+        load();
+        window.speechSynthesis.onvoiceschanged = load;
+      }
+
+      function speakFrenchText(text, rate) {
+        if (!('speechSynthesis' in window)) {
+          showToast('お使いのブラウザは音声読み上げに対応していません');
+          return;
+        }
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'fr-FR';
+          utter.rate = rate || 1.0;
+
+          if (appState.preferredVoiceURI && availableFrenchVoices.length > 0) {
+            const match = availableFrenchVoices.find((v) => v.voiceURI === appState.preferredVoiceURI);
+            if (match) utter.voice = match;
+          } else if (availableFrenchVoices.length > 0) {
+            const frStandard = availableFrenchVoices.find((v) => v.lang === 'fr-FR' || v.lang === 'fr_FR') || availableFrenchVoices[0];
+            if (frStandard) utter.voice = frStandard;
+          }
+          window.speechSynthesis.speak(utter);
+        } catch (err) {
+          // Ignore TTS error in headless environment
+        }
+      }
+
+      function stopMicrophone() {
+        isMicListening = false;
+        const btn = document.getElementById('btnStartMic');
+        const lbl = document.getElementById('micButtonLabel');
+        if (btn) btn.classList.remove('mic-listening', 'bg-rose-700');
+        if (lbl) lbl.textContent = 'マイクで発音判定 (Space)';
+        if (activeRecognition) {
+          try {
+            activeRecognition.abort();
+          } catch (e) {}
+          activeRecognition = null;
+        }
+      }
+
+      function startMicrophoneRecognition() {
+        if (!currentQuestion || currentQuestion.answered) return;
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const transcriptText = document.getElementById('speechTranscriptText');
+
+        if (!SpeechRec) {
+          if (transcriptText) {
+            transcriptText.textContent = '⚠️ このブラウザは音声認識非対応です（Chrome/Edge/Safari推奨）。下の自己判定ボタンをご利用ください。';
+          }
+          return;
+        }
+
+        if (isMicListening) {
+          stopMicrophone();
+          return;
+        }
+
+        try {
+          const rec = new SpeechRec();
+          activeRecognition = rec;
+          rec.lang = 'fr-FR';
+          rec.interimResults = true;
+          rec.maxAlternatives = 5;
+          rec.continuous = false;
+
+          isMicListening = true;
+          const btn = document.getElementById('btnStartMic');
+          const lbl = document.getElementById('micButtonLabel');
+          if (btn) btn.classList.add('mic-listening', 'bg-rose-700');
+          if (lbl) lbl.textContent = '聞き取り中... フランス語で発音してください';
+          if (transcriptText) {
+            transcriptText.innerHTML = '<span class="text-red-600 font-semibold">🎙️ 聞き取り中...</span> フランス語で発音してください';
+          }
+
+          rec.onresult = (event) => {
+            if (!currentQuestion || currentQuestion.answered) return;
+            const result = event.results[event.results.length - 1];
+            const alternatives = [];
+            for (let i = 0; i < result.length; i++) {
+              alternatives.push(result[i].transcript);
+            }
+
+            const check = isSpeechMatch(alternatives, currentQuestion.number);
+            if (transcriptText) {
+              transcriptText.textContent = '認識結果: 「' + (check.recognizedText || '...') + '」';
+            }
+
+            if (check.matched) {
+              stopMicrophone();
+              finalizeAnswer(true, '🎙️ 音声認識クリア（「' + check.recognizedText + '」）');
+            } else if (result.isFinal) {
+              stopMicrophone();
+              if (transcriptText) {
+                transcriptText.innerHTML = '認識結果: 「<strong>' + (check.recognizedText || '不明') + '</strong>」 — もう一度マイクを押すか、下の判定ボタンを選択してください';
+              }
+            }
+          };
+
+          rec.onerror = (ev) => {
+            stopMicrophone();
+            if (transcriptText) {
+              if (ev.error === 'not-allowed') {
+                transcriptText.textContent = '⚠️ マイク権限がブロックされています。ブラウザのURLバーからマイクを許可してください。';
+              } else {
+                transcriptText.textContent = '音声が聞き取れませんでした（もう一度Spaceまたはマイクボタンを押してください）';
+              }
+            }
+          };
+
+          rec.onend = () => {
+            if (isMicListening) stopMicrophone();
+          };
+
+          rec.start();
+        } catch (err) {
+          stopMicrophone();
+        }
+      }
+
+      // =========================================================================
+      // 6. Question Lifecycle & UI Rendering
+      // =========================================================================
+      function startQuestionTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        const timerEl = document.getElementById('timerDisplay');
+        timerInterval = setInterval(() => {
+          if (!currentQuestion || currentQuestion.answered) return;
+          const elapsed = ((Date.now() - currentQuestion.startTimeMs) / 1000).toFixed(1);
+          if (timerEl) timerEl.textContent = elapsed;
+        }, 100);
+      }
+
+      function recordAnswerStats(num, isCorrect, elapsedMs) {
+        const key = String(num);
+        const prev = appState.stats[key] || { ok: 0, ng: 0, avgMs: elapsedMs, weight: 1.0, updatedAt: 0 };
+        const nextOk = prev.ok + (isCorrect ? 1 : 0);
+        const nextNg = prev.ng + (isCorrect ? 0 : 1);
+        const nextAvgMs = Math.round(prev.avgMs * 0.7 + elapsedMs * 0.3);
+
+        let nextWeight = prev.weight || 1.0;
+        if (!isCorrect) {
+          nextWeight = Math.min(5.0, nextWeight + 1.5);
+        } else if (elapsedMs > 5000) {
+          // Answered right, but took over 5 seconds -> slight boost for fluency
+          nextWeight = Math.min(5.0, nextWeight + 0.4);
+        } else if (elapsedMs <= 3000) {
+          nextWeight = Math.max(0.5, nextWeight - 0.25);
+        } else {
+          nextWeight = Math.max(0.5, nextWeight - 0.1);
+        }
+
+        appState.stats[key] = {
+          ok: nextOk,
+          ng: nextNg,
+          avgMs: nextAvgMs,
+          weight: Number(nextWeight.toFixed(2)),
+          updatedAt: Date.now()
+        };
+
+        sessionTotal += 1;
+        if (isCorrect) {
+          sessionOk += 1;
+          sessionStreak += 1;
+        } else {
+          sessionStreak = 0;
+        }
+
+        saveLocalState(true);
+        refreshScoreboardUI();
+        refreshWeakCountBadge();
+      }
+
+      function startNewQuestion() {
+        stopMicrophone();
+        const num = pickNextQuestionNumber();
+        recentHistory.push(num);
+        if (recentHistory.length > 10) recentHistory.shift();
+
+        const info = getFrenchNumberInfo(num);
+        let activeMode = appState.mode;
+        if (activeMode === 'mix') {
+          const modes = ['speak', 'read', 'listen'];
+          activeMode = modes[Math.floor(Math.random() * modes.length)];
+        }
+
+        currentQuestion = {
+          number: num,
+          info: info,
+          activeMode: activeMode,
+          startTimeMs: Date.now(),
+          answered: false
+        };
+
+        // Update metadata badges
+        const catBadge = document.getElementById('currentCategoryBadge');
+        const weightBadge = document.getElementById('currentWeightBadge');
+        if (catBadge) catBadge.textContent = info.categoryLabel;
+        if (weightBadge) weightBadge.textContent = '苦手倍率: ×' + getNumberWeight(num).toFixed(1);
+
+        // Hide feedback panel
+        const fbPanel = document.getElementById('feedbackPanel');
+        if (fbPanel) fbPanel.classList.add('hidden');
+
+        // Configure mode-specific views
+        const instructionEl = document.getElementById('questionInstruction');
+        const primaryEl = document.getElementById('promptPrimaryText');
+        const speakSection = document.getElementById('speakModeInputSection');
+        const numSection = document.getElementById('numberInputSection');
+        const numInput = document.getElementById('numericAnswerInput');
+        const playNormalLabel = document.getElementById('btnPlayNormalLabel');
+        const transcriptText = document.getElementById('speechTranscriptText');
+
+        if (numInput) numInput.value = '';
+
+        if (activeMode === 'speak') {
+          if (instructionEl) instructionEl.textContent = 'この数字をフランス語で発音してください';
+          if (primaryEl) {
+            primaryEl.textContent = String(num);
+            primaryEl.className = 'text-6xl sm:text-7xl font-extrabold tracking-tight text-slate-900 select-all';
+          }
+          if (playNormalLabel) playNormalLabel.textContent = 'お手本音声を聞く';
+          if (speakSection) speakSection.classList.remove('hidden');
+          if (numSection) {
+            numSection.classList.add('hidden');
+            numSection.classList.remove('flex');
+          }
+          if (transcriptText) {
+            transcriptText.textContent = 'マイクボタンを押してフランス語で発音してください';
+          }
+          if (appState.autoStartMic) {
+            setTimeout(() => startMicrophoneRecognition(), 250);
+          }
+        } else if (activeMode === 'read') {
+          if (instructionEl) instructionEl.textContent = 'このフランス語の綴りが表す「数字」を入力してください';
+          if (primaryEl) {
+            primaryEl.textContent = info.spelling;
+            primaryEl.className = 'text-3xl sm:text-5xl font-extrabold text-blue-950 french-serif px-2 break-words';
+          }
+          if (playNormalLabel) playNormalLabel.textContent = 'ヒント音声を聞く';
+          if (speakSection) speakSection.classList.add('hidden');
+          if (numSection) {
+            numSection.classList.remove('hidden');
+            numSection.classList.add('flex');
+          }
+          if (numInput && window.innerWidth >= 640) numInput.focus();
+        } else if (activeMode === 'listen') {
+          if (instructionEl) instructionEl.textContent = '読み上げられたフランス語を聞いて「数字」を入力してください';
+          if (primaryEl) {
+            primaryEl.textContent = '🎧 音声リスニング';
+            primaryEl.className = 'text-2xl sm:text-4xl font-bold text-slate-700 py-2';
+          }
+          if (playNormalLabel) playNormalLabel.textContent = 'もう一度聞く (Space)';
+          if (speakSection) speakSection.classList.add('hidden');
+          if (numSection) {
+            numSection.classList.remove('hidden');
+            numSection.classList.add('flex');
+          }
+          if (numInput && window.innerWidth >= 640) numInput.focus();
+          setTimeout(() => speakFrenchText(info.spelling, 1.0), 150);
+        }
+
+        startQuestionTimer();
+      }
+
+      function finalizeAnswer(isCorrect, customLabel) {
+        if (!currentQuestion || currentQuestion.answered) return;
+        currentQuestion.answered = true;
+        stopMicrophone();
+        if (timerInterval) clearInterval(timerInterval);
+
+        const elapsedMs = Date.now() - currentQuestion.startTimeMs;
+        recordAnswerStats(currentQuestion.number, isCorrect, elapsedMs);
+
+        const fbPanel = document.getElementById('feedbackPanel');
+        const fbBadge = document.getElementById('feedbackBadge');
+        const fbLatency = document.getElementById('feedbackLatencyText');
+        const fbNum = document.getElementById('feedbackNumberText');
+        const fbSpell = document.getElementById('feedbackSpellingText');
+        const fbKana = document.getElementById('feedbackKanaText');
+        const fbBreak = document.getElementById('feedbackBreakdownText');
+
+        if (fbPanel) {
+          fbPanel.classList.remove('hidden', 'bg-emerald-50/90', 'border-emerald-300', 'bg-rose-50/90', 'border-rose-300');
+          if (isCorrect) {
+            fbPanel.classList.add('bg-emerald-50/90', 'border-emerald-300');
+          } else {
+            fbPanel.classList.add('bg-rose-50/90', 'border-rose-300');
+          }
+        }
+
+        if (fbBadge) {
+          fbBadge.textContent = customLabel || (isCorrect ? '⭕ 正解！' : '❌ 不正解・要復習');
+          fbBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold ' +
+            (isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white');
+        }
+
+        if (fbLatency) {
+          const sec = (elapsedMs / 1000).toFixed(1);
+          fbLatency.textContent = '回答時間: ' + sec + '秒' + (isCorrect && elapsedMs > 5000 ? '（5秒超過のため復習倍率UP）' : '');
+        }
+
+        if (fbNum) fbNum.textContent = String(currentQuestion.number);
+        if (fbSpell) fbSpell.textContent = currentQuestion.info.spelling;
+        if (fbKana) fbKana.textContent = '（' + currentQuestion.info.kana + '）';
+        if (fbBreak) fbBreak.textContent = '💡 構造・文法: ' + currentQuestion.info.breakdown;
+
+        if (appState.autoPlayFeedbackAudio) {
+          speakFrenchText(currentQuestion.info.spelling, 1.0);
+        }
+      }
+
+      function submitNumericAnswer() {
+        if (!currentQuestion) return;
+        if (currentQuestion.answered) {
+          startNewQuestion();
+          return;
+        }
+        const inputEl = document.getElementById('numericAnswerInput');
+        if (!inputEl) return;
+        const valStr = inputEl.value.trim();
+        if (valStr === '') return;
+
+        const userNum = parseInt(valStr, 10);
+        const isCorrect = userNum === currentQuestion.number;
+        const label = isCorrect
+          ? '⭕ 正解！ (' + userNum + ')'
+          : '❌ 不正解（あなたの回答: ' + (isNaN(userNum) ? valStr : userNum) + '）';
+        finalizeAnswer(isCorrect, label);
+      }
+
+      // =========================================================================
+      // 7. UI Sync & Helper Updates
+      // =========================================================================
+      function refreshScoreboardUI() {
+        const streakEl = document.getElementById('streakValue');
+        const accEl = document.getElementById('accuracyValue');
+        const totalEl = document.getElementById('totalSolvedValue');
+        if (streakEl) streakEl.textContent = String(sessionStreak);
+        if (totalEl) totalEl.textContent = String(sessionTotal);
+        if (accEl) {
+          accEl.textContent = sessionTotal > 0
+            ? Math.round((sessionOk / sessionTotal) * 100) + '%'
+            : '--%';
+        }
+      }
+
+      function refreshWeakCountBadge() {
+        const weakCount = Object.keys(appState.stats).filter((k) => {
+          const st = appState.stats[k];
+          return (st.weight || 1.0) > 1.2 || (st.ng || 0) > 0;
+        }).length;
+        const badge = document.getElementById('weakCountBadge');
+        if (badge) badge.textContent = String(weakCount);
+      }
+
+      function refreshWeightUI() {
+        const w = appState.weights;
+        const sum = (w.basic + w.std2 + w.var2 + w.digit3) || 100;
+        const pBasic = Math.round((w.basic / sum) * 100);
+        const pStd2 = Math.round((w.std2 / sum) * 100);
+        const pVar2 = Math.round((w.var2 / sum) * 100);
+        const pDigit3 = Math.max(0, 100 - pBasic - pStd2 - pVar2);
+
+        const setBar = (id, pct) => {
+          const el = document.getElementById(id);
+          if (el) el.style.width = pct + '%';
+        };
+        const setTxt = (id, pct) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = pct + '%';
+        };
+
+        setBar('barWeightBasic', pBasic);
+        setBar('barWeightStd2', pStd2);
+        setBar('barWeightVar2', pVar2);
+        setBar('barWeightDigit3', pDigit3);
+
+        setTxt('lblWeightBasic', pBasic);
+        setTxt('lblWeightStd2', pStd2);
+        setTxt('lblWeightVar2', pVar2);
+        setTxt('lblWeightDigit3', pDigit3);
+
+        // Update sliders in modal
+        const sBasic = document.getElementById('sliderWeightBasic');
+        const sStd2 = document.getElementById('sliderWeightStd2');
+        const sVar2 = document.getElementById('sliderWeightVar2');
+        const sDigit3 = document.getElementById('sliderWeightDigit3');
+        if (sBasic) sBasic.value = String(w.basic);
+        if (sStd2) sStd2.value = String(w.std2);
+        if (sVar2) sVar2.value = String(w.var2);
+        if (sDigit3) sDigit3.value = String(w.digit3);
+
+        setTxt('valSliderBasic', pBasic);
+        setTxt('valSliderStd2', pStd2);
+        setTxt('valSliderVar2', pVar2);
+        setTxt('valSliderDigit3', pDigit3);
+      }
+
+      function refreshModeTabsUI() {
+        const btns = document.querySelectorAll('.mode-tab-btn');
+        btns.forEach((btn) => {
+          const m = btn.getAttribute('data-mode');
+          if (m === appState.mode) {
+            btn.className = 'mode-tab-btn py-2 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 bg-white text-blue-700 shadow-sm';
+          } else {
+            btn.className = 'mode-tab-btn py-2 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900';
+          }
+        });
+      }
+
+      function refreshRangePillsUI() {
+        const btns = document.querySelectorAll('.range-pill-btn');
+        btns.forEach((btn) => {
+          const r = btn.getAttribute('data-range');
+          if (r === appState.rangePreset) {
+            btn.className = 'range-pill-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-600 text-white border border-blue-600 shadow-xs';
+          } else {
+            btn.className = 'range-pill-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100';
+          }
+        });
+      }
+
+      function renderStatsModalContent() {
+        const keys = Object.keys(appState.stats);
+        let totalOk = 0;
+        let weakCount = 0;
+        const list = [];
+
+        keys.forEach((k) => {
+          const st = appState.stats[k];
+          totalOk += st.ok || 0;
+          if ((st.weight || 1.0) > 1.2 || (st.ng || 0) > 0) weakCount += 1;
+          list.push({ num: parseInt(k, 10), ...st });
+        });
+
+        const elUnique = document.getElementById('statUniqueCount');
+        const elOk = document.getElementById('statTotalOkCount');
+        const elWeak = document.getElementById('statWeakItemsCount');
+        if (elUnique) elUnique.textContent = String(keys.length);
+        if (elOk) elOk.textContent = String(totalOk);
+        if (elWeak) elWeak.textContent = String(weakCount);
+
+        const tbody = document.getElementById('weakNumbersTableBody');
+        if (!tbody) return;
+
+        list.sort((a, b) => (b.weight || 1) - (a.weight || 1) || (b.ng || 0) - (a.ng || 0));
+        const topItems = list.slice(0, 15);
+
+        if (topItems.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-slate-400">まだ学習履歴がありません。問題を解くと自動で記録されます。</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        topItems.forEach((item) => {
+          const info = getFrenchNumberInfo(item.num);
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50';
+          tr.innerHTML =
+            '<td class="py-2 px-3 font-extrabold text-slate-900">' + item.num + '</td>' +
+            '<td class="py-2 px-3 font-semibold text-blue-700">' + info.spelling + ' <span class="text-[11px] text-slate-400 font-normal">(' + info.kana + ')</span></td>' +
+            '<td class="py-2 px-3 text-right font-mono"><span class="text-emerald-600">' + (item.ok || 0) + '</span> / <span class="text-rose-600">' + (item.ng || 0) + '</span></td>' +
+            '<td class="py-2 px-3 text-right font-bold ' + ((item.weight || 1) > 1.2 ? 'text-rose-600' : 'text-slate-600') + '">×' + (item.weight || 1.0).toFixed(1) + '</td>' +
+            '<td class="py-2 px-3 text-center"><button type="button" data-speak-spell="' + info.spelling + '" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-xs">🔊</button></td>';
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll('[data-speak-spell]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            speakFrenchText(btn.getAttribute('data-speak-spell'), 1.0);
+          });
+        });
+      }
+
+      function updateLookupPreview() {
+        const inp = document.getElementById('lookupNumberInput');
+        const box = document.getElementById('lookupResultBox');
+        if (!inp || !box) return;
+        const val = parseInt(inp.value, 10);
+        if (isNaN(val) || val < 0 || val > 1000) {
+          box.textContent = '0〜1000の数字を入力してください';
+          return;
+        }
+        const info = getFrenchNumberInfo(val);
+        box.innerHTML =
+          '<strong class="text-blue-700 text-sm">' + info.spelling + '</strong> ' +
+          '<span class="text-slate-600">（' + info.kana + '）</span><br>' +
+          '<span class="text-[11px] text-slate-500">' + info.breakdown + '</span>';
+      }
+
+      // =========================================================================
+      // 8. Event Listeners & Keyboard Shortcuts Initialization
+      // =========================================================================
+      function bindEvents() {
+        // Mode tabs
+        document.querySelectorAll('.mode-tab-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            appState.mode = btn.getAttribute('data-mode') || 'speak';
+            saveLocalState(false);
+            refreshModeTabsUI();
+            startNewQuestion();
+          });
+        });
+
+        // Range pills
+        document.querySelectorAll('.range-pill-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            appState.rangePreset = btn.getAttribute('data-range') || '0-1000';
+            saveLocalState(false);
+            refreshRangePillsUI();
+            startNewQuestion();
+          });
+        });
+
+        // Audio buttons
+        const btnNormalAudio = document.getElementById('btnPlayNormalAudio');
+        const btnSlowAudio = document.getElementById('btnPlaySlowAudio');
+        const btnReplayFeedback = document.getElementById('btnReplayFeedbackAudio');
+
+        if (btnNormalAudio) {
+          btnNormalAudio.addEventListener('click', () => {
+            if (currentQuestion) speakFrenchText(currentQuestion.info.spelling, 1.0);
+          });
+        }
+        if (btnSlowAudio) {
+          btnSlowAudio.addEventListener('click', () => {
+            if (currentQuestion) speakFrenchText(currentQuestion.info.spelling, 0.7);
+          });
+        }
+        if (btnReplayFeedback) {
+          btnReplayFeedback.addEventListener('click', () => {
+            if (currentQuestion) speakFrenchText(currentQuestion.info.spelling, 1.0);
+          });
+        }
+
+        // Mode A Mic & Self-Grading buttons
+        const btnStartMic = document.getElementById('btnStartMic');
+        const chkAutoMic = document.getElementById('chkAutoStartMic');
+        const btnRevealSpeak = document.getElementById('btnRevealAnswerSpeak');
+        const btnPassSpeak = document.getElementById('btnManualPassSpeak');
+        const btnFailSpeak = document.getElementById('btnManualFailSpeak');
+
+        if (btnStartMic) {
+          btnStartMic.addEventListener('click', () => startMicrophoneRecognition());
+        }
+        if (chkAutoMic) {
+          chkAutoMic.checked = !!appState.autoStartMic;
+          chkAutoMic.addEventListener('change', () => {
+            appState.autoStartMic = chkAutoMic.checked;
+            saveLocalState(false);
+          });
+        }
+        if (btnRevealSpeak) {
+          btnRevealSpeak.addEventListener('click', () => {
+            if (!currentQuestion) return;
+            speakFrenchText(currentQuestion.info.spelling, 1.0);
+            const transcriptText = document.getElementById('speechTranscriptText');
+            if (transcriptText) {
+              transcriptText.innerHTML = '正解: <strong class="text-blue-700">' + currentQuestion.info.spelling + '</strong> （' + currentQuestion.info.kana + '） — 下の「言えた / 言えなかった」を選択してください';
+            }
+          });
+        }
+        if (btnPassSpeak) {
+          btnPassSpeak.addEventListener('click', () => finalizeAnswer(true, '⭕ 自己判定：正解'));
+        }
+        if (btnFailSpeak) {
+          btnFailSpeak.addEventListener('click', () => finalizeAnswer(false, '❌ 自己判定：要復習'));
+        }
+
+        // Mode B & C Numeric Input & Numpad
+        const btnSubmitNum = document.getElementById('btnSubmitNumber');
+        const btnGiveUpNum = document.getElementById('btnGiveUpNumber');
+        const numInput = document.getElementById('numericAnswerInput');
+
+        if (btnSubmitNum) {
+          btnSubmitNum.addEventListener('click', () => submitNumericAnswer());
+        }
+        if (btnGiveUpNum) {
+          btnGiveUpNum.addEventListener('click', () => finalizeAnswer(false, '👀 ギブアップ（要復習）'));
+        }
+
+        document.querySelectorAll('[data-numpad]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (!numInput || (currentQuestion && currentQuestion.answered)) return;
+            const key = btn.getAttribute('data-numpad');
+            if (key === 'clear') {
+              numInput.value = '';
+            } else if (key === 'back') {
+              numInput.value = numInput.value.slice(0, -1);
+            } else if (numInput.value.length < 4) {
+              numInput.value += key;
+            }
+          });
+        });
+
+        // Next Question Button
+        const btnNext = document.getElementById('btnNextQuestion');
+        if (btnNext) {
+          btnNext.addEventListener('click', () => startNewQuestion());
+        }
+
+        // Global Keyboard Shortcuts (PC high-speed training)
+        window.addEventListener('keydown', (e) => {
+          // Ignore if modal is open or typing inside token/lookup input
+          const syncModal = document.getElementById('syncModal');
+          const weightsModal = document.getElementById('weightsModal');
+          const statsModal = document.getElementById('statsModal');
+          const modalOpen =
+            (syncModal && !syncModal.classList.contains('hidden')) ||
+            (weightsModal && !weightsModal.classList.contains('hidden')) ||
+            (statsModal && !statsModal.classList.contains('hidden'));
+          if (modalOpen) return;
+
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!currentQuestion) return;
+            if (currentQuestion.answered) {
+              startNewQuestion();
+            } else if (currentQuestion.activeMode !== 'speak') {
+              submitNumericAnswer();
+            } else {
+              finalizeAnswer(true, '⭕ 正解！');
+            }
+          } else if (e.key === ' ') {
+            if (document.activeElement === numInput && numInput.value.length > 0) return;
+            e.preventDefault();
+            if (!currentQuestion) return;
+            if (currentQuestion.activeMode === 'speak' && !currentQuestion.answered) {
+              startMicrophoneRecognition();
+            } else {
+              speakFrenchText(currentQuestion.info.spelling, 1.0);
+            }
+          }
+        });
+
+        // Modal 1: Auto-Sync Settings
+        const syncModal = document.getElementById('syncModal');
+        const btnOpenSync = document.getElementById('btnOpenSyncModal');
+        const btnCloseSync = document.getElementById('btnCloseSyncModal');
+        const btnConnectSync = document.getElementById('btnConnectAutoSync');
+        const btnDisconnectSync = document.getElementById('btnDisconnectSync');
+        const inputToken = document.getElementById('inputGithubToken');
+        const displayGist = document.getElementById('displayGistId');
+        const syncMsg = document.getElementById('syncModalFeedbackMsg');
+
+        if (btnOpenSync && syncModal) {
+          btnOpenSync.addEventListener('click', () => {
+            if (inputToken) inputToken.value = appState.syncConfig.githubToken || '';
+            if (displayGist) {
+              displayGist.textContent = appState.syncConfig.gistId || '未接続（トークン保存時に自動検索・新規作成します）';
+            }
+            if (syncMsg) syncMsg.classList.add('hidden');
+            syncModal.classList.remove('hidden');
+          });
+        }
+        if (btnCloseSync && syncModal) {
+          btnCloseSync.addEventListener('click', () => syncModal.classList.add('hidden'));
+        }
+        if (btnConnectSync) {
+          btnConnectSync.addEventListener('click', async () => {
+            const tokenVal = inputToken ? inputToken.value.trim() : '';
+            if (!tokenVal) {
+              if (syncMsg) {
+                syncMsg.textContent = '⚠️ GitHub Personal Access Token を入力してください。';
+                syncMsg.className = 'rounded-xl p-3 text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200';
+                syncMsg.classList.remove('hidden');
+              }
+              return;
+            }
+            appState.syncConfig.githubToken = tokenVal;
+            saveLocalState(false);
+            if (syncMsg) {
+              syncMsg.textContent = '🔄 GitHub APIと通信し、同期用Gistを自動探索・設定しています...';
+              syncMsg.className = 'rounded-xl p-3 text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200';
+              syncMsg.classList.remove('hidden');
+            }
+            try {
+              await performAutoCloudPull(false);
+              await performAutoCloudPush();
+              if (displayGist) displayGist.textContent = appState.syncConfig.gistId || '接続完了';
+              if (syncMsg) {
+                syncMsg.textContent = '✅ 自動同期の接続が完了しました！以降はPC・スマホで問題を解くたびにバックグラウンドで自動同期されます。';
+                syncMsg.className = 'rounded-xl p-3 text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200';
+              }
+            } catch (err) {
+              if (syncMsg) {
+                syncMsg.textContent = '❌ 接続失敗: ' + (err.message || 'トークンを確認してください');
+                syncMsg.className = 'rounded-xl p-3 text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200';
+              }
+            }
+          });
+        }
+        if (btnDisconnectSync) {
+          btnDisconnectSync.addEventListener('click', () => {
+            appState.syncConfig.githubToken = '';
+            appState.syncConfig.gistId = '';
+            saveLocalState(false);
+            if (inputToken) inputToken.value = '';
+            if (displayGist) displayGist.textContent = '未接続';
+            updateSyncStatusBadge('idle', '自動同期: 未設定');
+            showToast('自動クラウド同期を解除しました');
+          });
+        }
+
+        // Modal 2: Weights & Audio Settings
+        const weightsModal = document.getElementById('weightsModal');
+        const btnOpenWeights = document.getElementById('btnOpenWeightsModal');
+        const btnQuickWeights = document.getElementById('btnQuickEditWeights');
+        const btnCloseWeights = document.getElementById('btnCloseWeightsModal');
+        const btnSaveWeights = document.getElementById('btnSaveWeightsModal');
+        const btnResetWeights = document.getElementById('btnResetDefaultWeights');
+
+        const openWeightsFn = () => {
+          refreshWeightUI();
+          if (weightsModal) weightsModal.classList.remove('hidden');
+        };
+        if (btnOpenWeights) btnOpenWeights.addEventListener('click', openWeightsFn);
+        if (btnQuickWeights) btnQuickWeights.addEventListener('click', openWeightsFn);
+        if (btnCloseWeights && weightsModal) {
+          btnCloseWeights.addEventListener('click', () => weightsModal.classList.add('hidden'));
+        }
+        if (btnSaveWeights && weightsModal) {
+          btnSaveWeights.addEventListener('click', () => {
+            saveLocalState(true);
+            weightsModal.classList.add('hidden');
+            showToast('重み付け・音声設定を保存しました');
+          });
+        }
+
+        ['sliderWeightBasic', 'sliderWeightStd2', 'sliderWeightVar2', 'sliderWeightDigit3'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('input', () => {
+            appState.weights.basic = parseInt(document.getElementById('sliderWeightBasic').value, 10) || 0;
+            appState.weights.std2 = parseInt(document.getElementById('sliderWeightStd2').value, 10) || 0;
+            appState.weights.var2 = parseInt(document.getElementById('sliderWeightVar2').value, 10) || 0;
+            appState.weights.digit3 = parseInt(document.getElementById('sliderWeightDigit3').value, 10) || 0;
+            refreshWeightUI();
+          });
+        });
+
+        if (btnResetWeights) {
+          btnResetWeights.addEventListener('click', () => {
+            appState.weights = { basic: 15, std2: 25, var2: 35, digit3: 25 };
+            refreshWeightUI();
+            saveLocalState(true);
+          });
+        }
+
+        const selVoice = document.getElementById('selectFrenchVoice');
+        const chkAutoAudio = document.getElementById('chkAutoPlayFeedbackAudio');
+        if (selVoice) {
+          selVoice.addEventListener('change', () => {
+            appState.preferredVoiceURI = selVoice.value;
+            saveLocalState(false);
+          });
+        }
+        if (chkAutoAudio) {
+          chkAutoAudio.checked = !!appState.autoPlayFeedbackAudio;
+          chkAutoAudio.addEventListener('change', () => {
+            appState.autoPlayFeedbackAudio = chkAutoAudio.checked;
+            saveLocalState(false);
+          });
+        }
+
+        // Modal 3: Stats & Dictionary
+        const statsModal = document.getElementById('statsModal');
+        const btnOpenStats = document.getElementById('btnOpenStatsModal');
+        const btnCloseStats = document.getElementById('btnCloseStatsModal');
+        const btnResetConfirm = document.getElementById('btnResetStatsConfirm');
+        const resetBar = document.getElementById('resetConfirmBar');
+        const btnExecReset = document.getElementById('btnExecuteResetStats');
+        const btnCancelReset = document.getElementById('btnCancelResetStats');
+        const lookupInp = document.getElementById('lookupNumberInput');
+        const btnLookupPlay = document.getElementById('btnLookupPlayAudio');
+
+        if (btnOpenStats && statsModal) {
+          btnOpenStats.addEventListener('click', () => {
+            renderStatsModalContent();
+            updateLookupPreview();
+            statsModal.classList.remove('hidden');
+          });
+        }
+        if (btnCloseStats && statsModal) {
+          btnCloseStats.addEventListener('click', () => statsModal.classList.add('hidden'));
+        }
+        if (btnResetConfirm && resetBar) {
+          btnResetConfirm.addEventListener('click', () => resetBar.classList.remove('hidden'));
+        }
+        if (btnCancelReset && resetBar) {
+          btnCancelReset.addEventListener('click', () => resetBar.classList.add('hidden'));
+        }
+        if (btnExecReset && resetBar) {
+          btnExecReset.addEventListener('click', () => {
+            appState.stats = {};
+            sessionStreak = 0;
+            sessionOk = 0;
+            sessionTotal = 0;
+            saveLocalState(true);
+            resetBar.classList.add('hidden');
+            renderStatsModalContent();
+            refreshScoreboardUI();
+            refreshWeakCountBadge();
+            showToast('学習履歴をリセットしました');
+          });
+        }
+        if (lookupInp) {
+          lookupInp.addEventListener('input', () => updateLookupPreview());
+        }
+        if (btnLookupPlay && lookupInp) {
+          btnLookupPlay.addEventListener('click', () => {
+            const v = parseInt(lookupInp.value, 10);
+            if (!isNaN(v) && v >= 0 && v <= 1000) {
+              speakFrenchText(getFrenchNumberInfo(v).spelling, 1.0);
+            }
+          });
+        }
+
+        // Automatic background sync triggers (Tab Focus / Visibility / Pagehide)
+        window.addEventListener('focus', () => {
+          if (appState.syncConfig.githubToken && Date.now() - lastAutoPullMs > 20000) {
+            performAutoCloudPull(true);
+          }
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            if (appState.syncConfig.githubToken && Date.now() - lastAutoPullMs > 20000) {
+              performAutoCloudPull(true);
+            }
+          }
+        });
+      }
+
+      // Initialize App on Load
+      window.addEventListener('DOMContentLoaded', () => {
+        initVoices();
+        bindEvents();
+        refreshModeTabsUI();
+        refreshRangePillsUI();
+        refreshWeightUI();
+        refreshScoreboardUI();
+        refreshWeakCountBadge();
+        startNewQuestion();
+
+        if (appState.syncConfig.githubToken) {
+          performAutoCloudPull(true);
+        } else {
+          updateSyncStatusBadge('idle', '自動同期: 未設定');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
